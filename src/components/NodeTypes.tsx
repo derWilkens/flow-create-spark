@@ -1,5 +1,5 @@
 
-import React, { useCallback, useState, useRef, useEffect, memo } from 'react';
+import React, { useCallback, useState, useRef, useEffect, memo, ReactNode } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
 import { NodeData } from '../utils/diagramUtils';
 
@@ -51,6 +51,10 @@ export const TextUpdaterNode = memo(({ data, isConnectable, selected }: NodeProp
     }
   }, []);
   
+  // Safely access the label with proper typing
+  const nodeLabel = data && typeof data.label === 'string' ? data.label : '';
+  const displayText = nodeLabel || 'Double-click to edit';
+  
   return (
     <div className={`text-updater-node ${selected ? 'selected' : ''}`}>
       <Handle
@@ -69,7 +73,7 @@ export const TextUpdaterNode = memo(({ data, isConnectable, selected }: NodeProp
           <textarea
             ref={textAreaRef}
             name="text"
-            value={data ? data.label || '' : ''}
+            value={nodeLabel}
             onChange={onChange}
             onBlur={onBlur}
             onKeyDown={onKeyDown}
@@ -82,7 +86,7 @@ export const TextUpdaterNode = memo(({ data, isConnectable, selected }: NodeProp
           className="p-3 break-words whitespace-pre-wrap min-h-[60px]" 
           onDoubleClick={onDoubleClick}
         >
-          {data && data.label ? data.label : 'Double-click to edit'}
+          {displayText}
         </div>
       )}
       
