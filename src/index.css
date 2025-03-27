@@ -153,8 +153,11 @@
   @apply min-h-[60px];
 }
 
+/* Fix for the handle styles - using correct Tailwind syntax */
 .react-flow__handle {
-  @apply bg-diagram-handle-DEFAULT border-diagram-handle-DEFAULT w-3 h-3 opacity-0 transition-opacity duration-200;
+  @apply w-3 h-3 opacity-0 transition-opacity duration-200;
+  background-color: theme('colors.diagram.handle.DEFAULT');
+  border-color: theme('colors.diagram.handle.DEFAULT');
 }
 
 .react-flow__handle-right {
@@ -177,8 +180,10 @@
   @apply opacity-100;
 }
 
+/* Fix for handle hover styles */
 .react-flow__handle:hover {
-  @apply bg-diagram-handle-hover border-diagram-handle-hover;
+  background-color: theme('colors.diagram.handle.hover');
+  border-color: theme('colors.diagram.handle.hover');
 }
 
 .react-flow__edge-path {

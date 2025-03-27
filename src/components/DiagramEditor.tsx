@@ -18,14 +18,13 @@ import { toast } from 'sonner';
 
 import '@xyflow/react/dist/style.css';
 
-import { nodeTypes, TextUpdaterNode } from './NodeTypes';
+import { nodeTypes } from './NodeTypes';
 import { edgeTypes } from './EdgeTypes';
 import Toolbar from './Toolbar';
 import NodeContextMenu from './NodeContextMenu';
 import {
   createNode,
   addNewEdge,
-  updateNodeData,
   deleteElements,
   downloadDiagramAsJson,
   exportDiagramAsImage,
@@ -42,8 +41,8 @@ export function DiagramEditor() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   
   // State for nodes and edges
-  const [nodes, setNodes, onNodesChange] = useNodesState<CustomNode['data']>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<CustomEdge['data']>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<CustomNode["data"]>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<CustomEdge["data"]>([]);
   
   // State for context menu
   const [contextMenu, setContextMenu] = useState<{
@@ -125,7 +124,7 @@ export function DiagramEditor() {
         onNodeLabelChange(newNode.id, newLabel);
       };
       
-      setNodes(prevNodes => prevNodes.concat(newNode));
+      setNodes(prevNodes => [...prevNodes, newNode]);
       
       // Show toast for adding node
       toast.success("Node added", {
@@ -188,7 +187,7 @@ export function DiagramEditor() {
       
       // Simply trigger the node data's onLabelChange with its current label
       // This is a trick to get the node to enter edit mode
-      if (nodeToEdit.data.onLabelChange) {
+      if (nodeToEdit.data && nodeToEdit.data.onLabelChange) {
         nodeToEdit.data.onLabelChange(nodeToEdit.data.label);
       }
     },
@@ -213,11 +212,13 @@ export function DiagramEditor() {
       newNode.data = { ...nodeToDuplicate.data };
       
       // Add the onLabelChange callback to the new node data
-      newNode.data.onLabelChange = (newLabel: string) => {
-        onNodeLabelChange(newNode.id, newLabel);
-      };
+      if (newNode.data) {
+        newNode.data.onLabelChange = (newLabel: string) => {
+          onNodeLabelChange(newNode.id, newLabel);
+        };
+      }
       
-      setNodes(prevNodes => prevNodes.concat(newNode));
+      setNodes(prevNodes => [...prevNodes, newNode]);
       
       // Show toast for duplicating node
       toast.success("Node duplicated");
@@ -284,7 +285,7 @@ export function DiagramEditor() {
   const edgesWithDeleteCallback = edges.map(edge => ({
     ...edge,
     data: {
-      ...edge.data,
+      ...(edge.data || {}),
       onDelete: onDeleteEdge,
     },
   }));
