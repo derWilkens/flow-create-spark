@@ -2,7 +2,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Node, Edge, useNodesState, useEdgesState, Connection, useReactFlow } from '@xyflow/react';
 import { toast } from 'sonner';
-import { createNode, addNewEdge, deleteElements, CustomNode, CustomEdge } from '../utils/diagramUtils';
+import { createNode, addNewEdge, deleteElements, CustomNode, CustomEdge, NodeData } from '../utils/diagramUtils';
 
 // Local storage key for saving diagrams
 const STORAGE_KEY = 'diagram-app-data';
@@ -12,8 +12,8 @@ export function useDiagramState() {
   const reactFlowInstance = useReactFlow();
   
   // State for nodes and edges
-  const [nodes, setNodes, onNodesChange] = useNodesState<CustomNode["data"]>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<CustomEdge["data"]>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   
   // State to track if the diagram is empty
   const [isDiagramEmpty, setIsDiagramEmpty] = useState(true);
@@ -73,14 +73,14 @@ export function useDiagramState() {
     (nodeId: string) => {
       // Use our utility to delete node and connected edges
       const { nodes: updatedNodes, edges: updatedEdges } = deleteElements(
-        nodes as Node[],
-        edges as Edge[],
+        nodes,
+        edges,
         [nodeId],
         []
       );
       
-      setNodes(updatedNodes as any);
-      setEdges(updatedEdges as any);
+      setNodes(updatedNodes);
+      setEdges(updatedEdges);
       
       // Show toast for deleting node
       toast.info("Node deleted");
@@ -119,16 +119,18 @@ export function useDiagramState() {
       
       // Create a new node with the same type and data
       const newNode = createNode(newPosition, nodeToDuplicate.type);
-      newNode.data = { ...nodeToDuplicate.data };
+      newNode.data = { 
+        ...nodeToDuplicate.data,
+        // Override the label to ensure it's copied
+        label: nodeToDuplicate.data.label || 'New Node'
+      };
       
       // Add the onLabelChange callback to the new node data
-      if (newNode.data) {
-        newNode.data.onLabelChange = (newLabel: string) => {
-          onNodeLabelChange(newNode.id, newLabel);
-        };
-      }
+      newNode.data.onLabelChange = (newLabel: string) => {
+        onNodeLabelChange(newNode.id, newLabel);
+      };
       
-      setNodes(prevNodes => [...prevNodes, newNode]);
+      setNodes(prevNodes => [...prevNodes, newNode as Node<NodeData>]);
       
       // Show toast for duplicating node
       toast.success("Node duplicated");

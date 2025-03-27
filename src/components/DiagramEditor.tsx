@@ -79,9 +79,9 @@ export function DiagramEditor() {
   return (
     <div className="w-full h-full" ref={reactFlowWrapper}>
       <ReactFlow
-        nodes={nodes as any}
-        edges={edgesWithDeleteCallback as any}
-        onNodesChange={onNodesChange as any}
+        nodes={nodes}
+        edges={edgesWithDeleteCallback}
+        onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onPaneClick={onPaneClick}

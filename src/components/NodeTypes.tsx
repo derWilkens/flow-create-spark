@@ -1,9 +1,10 @@
 
-import { useCallback, useState, useRef, useEffect } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
+import { NodeData } from '../utils/diagramUtils';
 
 // TextUpdaterNode allows users to edit the text of a node
-export function TextUpdaterNode({ data, isConnectable, selected }: NodeProps) {
+export function TextUpdaterNode({ data, isConnectable, selected }: NodeProps<NodeData>) {
   const [isEditing, setIsEditing] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   
@@ -68,7 +69,7 @@ export function TextUpdaterNode({ data, isConnectable, selected }: NodeProps) {
           <textarea
             ref={textAreaRef}
             name="text"
-            value={data.label}
+            value={data.label || ''}
             onChange={onChange}
             onBlur={onBlur}
             onKeyDown={onKeyDown}

@@ -2,6 +2,11 @@
 import React from 'react';
 import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
 
+interface ButtonEdgeData {
+  onDelete?: (id: string) => void;
+  animated?: boolean;
+}
+
 // Custom edge with a delete button
 export function ButtonEdge({
   id,
@@ -14,7 +19,7 @@ export function ButtonEdge({
   style = {},
   markerEnd,
   data,
-}: EdgeProps) {
+}: EdgeProps<ButtonEdgeData>) {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -58,9 +63,23 @@ export function ButtonEdge({
   );
 }
 
+interface SmoothStepEdgeData {
+  animated?: boolean;
+}
+
 // Smooth step edge with animation options
-export function SmoothStepEdge(props: EdgeProps) {
-  const { style = {}, data } = props;
+export function SmoothStepEdge(props: EdgeProps<SmoothStepEdgeData>) {
+  const { style = {}, data, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, markerEnd } = props;
+  
+  // Calculate the path
+  const [edgePath] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  });
   
   // Add animation class if specified in data
   const customStyle = {
@@ -68,7 +87,7 @@ export function SmoothStepEdge(props: EdgeProps) {
     ...(data?.animated ? { animation: 'flowLineAnimation 30s infinite linear' } : {}),
   };
   
-  return <BaseEdge {...props} style={customStyle} />;
+  return <BaseEdge path={edgePath} markerEnd={markerEnd} style={customStyle} />;
 }
 
 // Edge type mapping

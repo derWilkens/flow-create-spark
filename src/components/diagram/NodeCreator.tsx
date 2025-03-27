@@ -1,9 +1,14 @@
 
 import { useCallback, useRef } from 'react';
+import { Node } from '@xyflow/react';
 import { toast } from 'sonner';
-import { createNode } from '../../utils/diagramUtils';
+import { createNode, NodeData } from '../../utils/diagramUtils';
 
-export function useNodeCreator(reactFlowInstance: any, onNodeLabelChange: (nodeId: string, label: string) => void, setNodes: any) {
+export function useNodeCreator(
+  reactFlowInstance: any, 
+  onNodeLabelChange: (nodeId: string, label: string) => void, 
+  setNodes: React.Dispatch<React.SetStateAction<Node<NodeData>[]>>
+) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   
   // Handle double click to add node
@@ -27,7 +32,7 @@ export function useNodeCreator(reactFlowInstance: any, onNodeLabelChange: (nodeI
         onNodeLabelChange(newNode.id, newLabel);
       };
       
-      setNodes((prevNodes: any) => [...prevNodes, newNode]);
+      setNodes((prevNodes) => [...prevNodes, newNode]);
       
       // Show toast for adding node
       toast.success("Node added", {
