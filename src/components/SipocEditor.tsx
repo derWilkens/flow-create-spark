@@ -20,6 +20,7 @@ import { ViewType } from '../hooks/useViewState';
 import { useDiagramControls } from '../hooks/useDiagramControls';
 import { ContextMenuManager } from './diagram/ContextMenuManager';
 import { createNode, CustomNode } from '../utils/diagramUtils';
+import { LibraryElement } from '../utils/elementLibraryUtils';
 
 // Define the SIPOC column types
 export type SipocColumnType = 'supplier' | 'input' | 'process' | 'output' | 'customer';

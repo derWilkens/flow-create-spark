@@ -3,7 +3,7 @@ import { Edge, Node, Connection, XYPosition, addEdge, Edge as FlowEdge, MarkerTy
 import { v4 as uuidv4 } from 'uuid';
 
 // Define SIPOC node types
-export type SipocNodeType = 'supplier' | 'input' | 'process' | 'output' | 'customer';
+export type SipocNodeType = 'supplier' | 'input' | 'process' | 'output' | 'customer' | 'generic';
 
 // Define NodeData interface correctly
 export interface NodeData {

@@ -1,4 +1,3 @@
-
 import React, { useCallback, useState, useRef, useEffect, memo, ReactNode } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
 import { NodeData, SipocNodeType } from '../utils/diagramUtils';
@@ -9,7 +8,8 @@ const NODE_TYPE_COLORS: Record<SipocNodeType, string> = {
   input: '#2196f3',
   process: '#ff9800',
   output: '#9c27b0',
-  customer: '#f44336'
+  customer: '#f44336',
+  generic: '#607d8b'
 };
 
 // TextUpdaterNode allows users to edit the text of a node
