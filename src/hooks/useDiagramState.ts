@@ -130,7 +130,7 @@ export function useDiagramState() {
         onNodeLabelChange(newNode.id, newLabel);
       };
       
-      setNodes(prevNodes => [...prevNodes, newNode as Node<NodeData>]);
+      setNodes(prevNodes => [...prevNodes, newNode]);
       
       // Show toast for duplicating node
       toast.success("Node duplicated");

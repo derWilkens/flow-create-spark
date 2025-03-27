@@ -2,11 +2,14 @@
 import { Edge, Node, Connection, XYPosition, addEdge, Edge as FlowEdge, MarkerType } from '@xyflow/react';
 import { v4 as uuidv4 } from 'uuid';
 
+// Make NodeData a proper record for React Flow's expectations
 export interface NodeData {
   label: string;
   onLabelChange?: (label: string) => void;
+  [key: string]: any; // Add index signature to satisfy Record<string, unknown>
 }
 
+// Define the correct node and edge types
 export type CustomNode = Node<NodeData>;
 export type CustomEdge = Edge;
 

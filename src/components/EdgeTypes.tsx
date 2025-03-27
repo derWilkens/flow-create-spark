@@ -2,9 +2,11 @@
 import React from 'react';
 import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
 
-interface ButtonEdgeData {
+// Define properly typed data interfaces for the edge types
+export interface ButtonEdgeData {
   onDelete?: (id: string) => void;
   animated?: boolean;
+  [key: string]: any; // Add index signature
 }
 
 // Custom edge with a delete button
@@ -63,8 +65,9 @@ export function ButtonEdge({
   );
 }
 
-interface SmoothStepEdgeData {
+export interface SmoothStepEdgeData {
   animated?: boolean;
+  [key: string]: any; // Add index signature
 }
 
 // Smooth step edge with animation options
@@ -90,8 +93,8 @@ export function SmoothStepEdge(props: EdgeProps<SmoothStepEdgeData>) {
   return <BaseEdge path={edgePath} markerEnd={markerEnd} style={customStyle} />;
 }
 
-// Edge type mapping
+// Export types with React.memo for better performance
 export const edgeTypes = {
-  buttonEdge: ButtonEdge,
-  smoothStepEdge: SmoothStepEdge,
+  buttonEdge: React.memo(ButtonEdge),
+  smoothStepEdge: React.memo(SmoothStepEdge),
 };

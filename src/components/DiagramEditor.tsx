@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -7,13 +7,15 @@ import {
   Background,
   BackgroundVariant,
   Panel,
+  NodeTypes,
+  EdgeTypes,
 } from '@xyflow/react';
 import { toast } from 'sonner';
 
 import '@xyflow/react/dist/style.css';
 
-import { nodeTypes } from './NodeTypes';
-import { edgeTypes } from './EdgeTypes';
+import { nodeTypes as customNodeTypes } from './NodeTypes';
+import { edgeTypes as customEdgeTypes } from './EdgeTypes';
 import Toolbar from './Toolbar';
 import { useDiagramState } from '../hooks/useDiagramState';
 import { useDiagramControls } from '../hooks/useDiagramControls';
@@ -67,6 +69,10 @@ export function DiagramEditor() {
     setNodes
   );
   
+  // Memoize node and edge types to avoid recreation on every render
+  const memoizedNodeTypes = useMemo(() => customNodeTypes, []);
+  const memoizedEdgeTypes = useMemo(() => customEdgeTypes, []);
+  
   // Prepare edge data with onDelete callback
   const edgesWithDeleteCallback = edges.map(edge => ({
     ...edge,
@@ -87,8 +93,8 @@ export function DiagramEditor() {
         onPaneClick={onPaneClick}
         onPaneContextMenu={onPaneContextMenu}
         onNodeContextMenu={onNodeContextMenu}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
+        nodeTypes={memoizedNodeTypes}
+        edgeTypes={memoizedEdgeTypes}
         fitView
         minZoom={0.1}
         maxZoom={2}

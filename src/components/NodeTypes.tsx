@@ -1,10 +1,10 @@
 
-import React, { useCallback, useState, useRef, useEffect } from 'react';
+import React, { useCallback, useState, useRef, useEffect, memo } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
 import { NodeData } from '../utils/diagramUtils';
 
 // TextUpdaterNode allows users to edit the text of a node
-export function TextUpdaterNode({ data, isConnectable, selected }: NodeProps<NodeData>) {
+export const TextUpdaterNode = memo(({ data, isConnectable, selected }: NodeProps<NodeData>) => {
   const [isEditing, setIsEditing] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   
@@ -22,7 +22,7 @@ export function TextUpdaterNode({ data, isConnectable, selected }: NodeProps<Nod
   
   // Handle text change
   const onChange = useCallback((evt: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (data.onLabelChange) {
+    if (data?.onLabelChange) {
       data.onLabelChange(evt.target.value);
     }
   }, [data]);
@@ -69,7 +69,7 @@ export function TextUpdaterNode({ data, isConnectable, selected }: NodeProps<Nod
           <textarea
             ref={textAreaRef}
             name="text"
-            value={data.label || ''}
+            value={data?.label || ''}
             onChange={onChange}
             onBlur={onBlur}
             onKeyDown={onKeyDown}
@@ -82,7 +82,7 @@ export function TextUpdaterNode({ data, isConnectable, selected }: NodeProps<Nod
           className="p-3 break-words whitespace-pre-wrap min-h-[60px]" 
           onDoubleClick={onDoubleClick}
         >
-          {data.label || 'Double-click to edit'}
+          {data?.label || 'Double-click to edit'}
         </div>
       )}
       
@@ -98,7 +98,7 @@ export function TextUpdaterNode({ data, isConnectable, selected }: NodeProps<Nod
       />
     </div>
   );
-}
+});
 
 // Node type mapping
 export const nodeTypes = {
