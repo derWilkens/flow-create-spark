@@ -16,12 +16,13 @@ import { nodeTypes as customNodeTypes } from './NodeTypes';
 import { edgeTypes as customEdgeTypes } from './EdgeTypes';
 import Toolbar from './Toolbar';
 import { useDiagramState } from '../hooks/useDiagramState';
+import { ViewType } from '../hooks/useViewState';
 import { useDiagramControls } from '../hooks/useDiagramControls';
 import { ContextMenuManager } from './diagram/ContextMenuManager';
 import { useNodeCreator } from './diagram/NodeCreator';
 
-export function DiagramEditor() {
-  // Get diagram state and operations from our custom hook
+export function DiagramEditor({ viewType = 'flow' as ViewType }) {
+  // Get diagram state and operations from our custom hook with the current view type
   const {
     nodes,
     edges, 
@@ -39,7 +40,7 @@ export function DiagramEditor() {
     setNodes,
     setEdges,
     reactFlowInstance
-  } = useDiagramState();
+  } = useDiagramState(viewType);
   
   // Get diagram UI controls
   const {

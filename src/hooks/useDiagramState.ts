@@ -4,10 +4,13 @@ import { Node, Edge, useNodesState, useEdgesState, Connection, useReactFlow } fr
 import { toast } from 'sonner';
 import { createNode, addNewEdge, deleteElements, CustomNode, CustomEdge, NodeData } from '../utils/diagramUtils';
 
-// Local storage key for saving diagrams
-const STORAGE_KEY = 'diagram-app-data';
+// Local storage keys for saving diagrams
+const FLOW_STORAGE_KEY = 'flow-diagram-data';
+const SIPOC_STORAGE_KEY = 'sipoc-diagram-data';
 
-export function useDiagramState() {
+export function useDiagramState(viewType: 'flow' | 'sipoc' = 'flow') {
+  // Determine which storage key to use based on view type
+  const STORAGE_KEY = viewType === 'flow' ? FLOW_STORAGE_KEY : SIPOC_STORAGE_KEY;
   // React Flow hook for accessing instance methods
   const reactFlowInstance = useReactFlow();
   

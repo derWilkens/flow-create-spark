@@ -2,10 +2,14 @@
 import { Edge, Node, Connection, XYPosition, addEdge, Edge as FlowEdge, MarkerType } from '@xyflow/react';
 import { v4 as uuidv4 } from 'uuid';
 
+// Define SIPOC node types
+export type SipocNodeType = 'supplier' | 'input' | 'process' | 'output' | 'customer';
+
 // Define NodeData interface correctly
 export interface NodeData {
   label: string;
   onLabelChange?: (label: string) => void;
+  nodeType?: SipocNodeType; // Add node type for SIPOC
   [key: string]: any; // Index signature for compatibility
 }
 
