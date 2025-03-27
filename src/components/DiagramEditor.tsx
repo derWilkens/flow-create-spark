@@ -1,5 +1,5 @@
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useCallback } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -7,6 +7,7 @@ import {
   Background,
   BackgroundVariant,
   Panel,
+  useReactFlow,
 } from '@xyflow/react';
 import { toast } from 'sonner';
 
@@ -20,8 +21,16 @@ import { ViewType } from '../hooks/useViewState';
 import { useDiagramControls } from '../hooks/useDiagramControls';
 import { ContextMenuManager } from './diagram/ContextMenuManager';
 import { useNodeCreator } from './diagram/NodeCreator';
+import { LibraryElement } from '../utils/elementLibraryUtils';
+import { createNode } from '../utils/diagramUtils';
 
-export function DiagramEditor({ viewType = 'flow' as ViewType }) {
+// Props-Definition für DiagramEditor
+interface DiagramEditorProps {
+  viewType?: ViewType;
+  draggedElement?: LibraryElement | null;
+}
+
+export function DiagramEditor({ viewType = 'flow', draggedElement = null }: DiagramEditorProps) {
   // Get diagram state and operations from our custom hook with the current view type
   const {
     nodes,
@@ -67,6 +76,64 @@ export function DiagramEditor({ viewType = 'flow' as ViewType }) {
     onNodeLabelChange,
     setNodes
   );
+
+  // Funktion zum Behandeln des Drop-Events für Bibliothekselemente
+  const onDrop = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+
+      if (!reactFlowWrapper.current || !reactFlowInstance) return;
+
+      // Prüfen, ob Daten vorhanden sind
+      const elementData = event.dataTransfer.getData('application/reactflow');
+      if (!elementData) return;
+
+      try {
+        // Bibliothekselement aus den übertragenen Daten extrahieren
+        const element = JSON.parse(elementData) as LibraryElement;
+
+        // Position berechnen, wo das Element fallen gelassen wurde
+        const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+        const position = reactFlowInstance.screenToFlowPosition({
+          x: event.clientX - reactFlowBounds.left,
+          y: event.clientY - reactFlowBounds.top,
+        });
+
+        // Neues Node erstellen basierend auf dem Bibliothekselement
+        const newNode = createNode(position, 'textUpdater');
+        
+        // Node-Daten mit Bibliothekselement-Informationen füllen
+        newNode.data = {
+          ...newNode.data,
+          label: element.name,
+          nodeType: element.type,
+          description: element.description,
+          libraryElementId: element.id, // Referenz zum Original speichern
+        };
+
+        // onLabelChange-Callback hinzufügen
+        newNode.data.onLabelChange = (newLabel: string) => {
+          onNodeLabelChange(newNode.id, newLabel);
+        };
+
+        // Node zur Diagramm-State hinzufügen
+        setNodes((prevNodes) => [...prevNodes, newNode]);
+
+        // Feedback für den Benutzer
+        toast.success(`Element "${element.name}" hinzugefügt`);
+      } catch (error) {
+        console.error('Fehler beim Hinzufügen des Elements:', error);
+        toast.error('Element konnte nicht hinzugefügt werden');
+      }
+    },
+    [reactFlowInstance, setNodes, onNodeLabelChange]
+  );
+
+  // Drag-Over-Handler für drop-Funktionalität
+  const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
   
   // Memoize node and edge types to avoid recreation on every render
   const memoizedNodeTypes = useMemo(() => customNodeTypes, []);
@@ -84,7 +151,7 @@ export function DiagramEditor({ viewType = 'flow' as ViewType }) {
   }, [edges, onDeleteEdge]);
   
   return (
-    <div className="w-full h-full" ref={reactFlowWrapper}>
+    <div className="w-full h-full" ref={reactFlowWrapper} onDrop={onDrop} onDragOver={onDragOver}>
       <ReactFlow
         nodes={nodes}
         edges={edgesWithDeleteCallback}
@@ -130,7 +197,7 @@ export function DiagramEditor({ viewType = 'flow' as ViewType }) {
         {isDiagramEmpty && (
           <div className="intro-message">
             <p className="text-lg mb-2">Double-click anywhere to add a node</p>
-            <p className="text-sm">Connect nodes by dragging from one handle to another</p>
+            <p className="text-sm">Or drag elements from the library</p>
           </div>
         )}
       </ReactFlow>

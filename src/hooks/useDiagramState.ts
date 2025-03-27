@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { Node, Edge, useNodesState, useEdgesState, Connection, useReactFlow } from '@xyflow/react';
 import { toast } from 'sonner';
@@ -48,13 +47,16 @@ export function useDiagramState(viewType: 'flow' | 'sipoc' = 'flow') {
       setNodes(prevNodes =>
         prevNodes.map(node => {
           if (node.id === nodeId) {
-            return {
+            // Aktualisieren des Labels für das Node
+            const updatedNode = {
               ...node,
               data: {
                 ...node.data,
                 label,
               },
             };
+            
+            return updatedNode;
           }
           return node;
         })

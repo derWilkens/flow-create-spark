@@ -36,7 +36,13 @@ const SIPOC_COLUMNS: { type: SipocColumnType; title: string; color: string }[] =
 // Calculate column width based on the number of columns
 const COLUMN_WIDTH_PERCENT = 100 / SIPOC_COLUMNS.length;
 
-export function SipocEditor({ viewType = 'sipoc' as ViewType }) {
+// Props-Definition für SipocEditor
+interface SipocEditorProps {
+  viewType?: ViewType;
+  draggedElement?: LibraryElement | null;
+}
+
+export function SipocEditor({ viewType = 'sipoc', draggedElement = null }: SipocEditorProps) {
   // Get diagram state and operations from our custom hook with the SIPOC view type
   const {
     nodes,
@@ -132,6 +138,82 @@ export function SipocEditor({ viewType = 'sipoc' as ViewType }) {
     [reactFlowInstance, setNodes, onNodeLabelChange, screenToFlowPosition]
   );
   
+  // Funktion zum Behandeln des Drop-Events für Bibliothekselemente
+  const onDrop = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+
+      if (!reactFlowWrapper.current || !reactFlowInstance) return;
+
+      // Prüfen, ob Daten vorhanden sind
+      const elementData = event.dataTransfer.getData('application/reactflow');
+      if (!elementData) return;
+
+      try {
+        // Bibliothekselement aus den übertragenen Daten extrahieren
+        const element = JSON.parse(elementData) as LibraryElement;
+
+        // Position berechnen, wo das Element fallen gelassen wurde
+        const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+        const dropPosition = {
+          x: event.clientX - reactFlowBounds.left,
+          y: event.clientY - reactFlowBounds.top,
+        };
+        
+        // Bestimme, in welche Spalte das Element fallen gelassen wurde
+        const columnWidth = reactFlowBounds.width / SIPOC_COLUMNS.length;
+        const columnIndex = Math.floor(dropPosition.x / columnWidth);
+        const columnType = SIPOC_COLUMNS[columnIndex].type;
+        
+        // Überprüfe, ob das Element-Typ mit der Spalte übereinstimmt
+        if (element.type !== columnType && element.type !== 'generic') {
+          toast.warning(`${element.name} kann nicht in die ${SIPOC_COLUMNS[columnIndex].title}-Spalte gezogen werden`);
+          return;
+        }
+        
+        // Position in Flow-Koordinaten umrechnen
+        const position = reactFlowInstance.screenToFlowPosition(dropPosition);
+        
+        // Neues Node erstellen basierend auf dem Bibliothekselement
+        const newNode = createNode(position, 'textUpdater');
+        
+        // Node-Daten mit Bibliothekselement-Informationen füllen
+        newNode.data = {
+          ...newNode.data,
+          label: element.name,
+          nodeType: columnType, // Verwende Spaltentyp, um sicherzustellen, dass es passt
+          description: element.description,
+          libraryElementId: element.id, // Referenz zum Original speichern
+        };
+
+        // Zentriere den Knoten horizontal in seiner Spalte
+        const columnCenter = (columnIndex * columnWidth) + (columnWidth / 2);
+        newNode.position.x = reactFlowInstance.screenToFlowPosition({ x: columnCenter, y: 0 }).x;
+        
+        // onLabelChange-Callback hinzufügen
+        newNode.data.onLabelChange = (newLabel: string) => {
+          onNodeLabelChange(newNode.id, newLabel);
+        };
+
+        // Node zur Diagramm-State hinzufügen
+        setNodes((prevNodes) => [...prevNodes, newNode]);
+
+        // Feedback für den Benutzer
+        toast.success(`Element "${element.name}" hinzugefügt`);
+      } catch (error) {
+        console.error('Fehler beim Hinzufügen des Elements:', error);
+        toast.error('Element konnte nicht hinzugefügt werden');
+      }
+    },
+    [reactFlowInstance, setNodes, onNodeLabelChange]
+  );
+
+  // Drag-Over-Handler für drop-Funktionalität
+  const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+  
   // Memoize node and edge types to avoid recreation on every render
   const memoizedNodeTypes = useMemo(() => customNodeTypes, []);
   const memoizedEdgeTypes = useMemo(() => customEdgeTypes, []);
@@ -148,7 +230,7 @@ export function SipocEditor({ viewType = 'sipoc' as ViewType }) {
   }, [edges, onDeleteEdge]);
   
   return (
-    <div className="w-full h-full" ref={reactFlowWrapper}>
+    <div className="w-full h-full" ref={reactFlowWrapper} onDrop={onDrop} onDragOver={onDragOver}>
       {/* SIPOC Column Headers */}
       <div className="absolute top-0 left-0 right-0 z-10 flex h-12 border-b border-gray-200 bg-white">
         {SIPOC_COLUMNS.map((column, index) => (
@@ -225,7 +307,7 @@ export function SipocEditor({ viewType = 'sipoc' as ViewType }) {
         {isDiagramEmpty && (
           <div className="intro-message">
             <p className="text-lg mb-2">Double-click in a column to add a node</p>
-            <p className="text-sm">Connect nodes by dragging from one handle to another</p>
+            <p className="text-sm">Or drag elements from the library into the appropriate column</p>
           </div>
         )}
       </ReactFlow>
