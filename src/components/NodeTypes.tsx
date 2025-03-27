@@ -4,7 +4,7 @@ import { Handle, Position, NodeProps } from '@xyflow/react';
 import { NodeData } from '../utils/diagramUtils';
 
 // TextUpdaterNode allows users to edit the text of a node
-export const TextUpdaterNode = memo(({ data, isConnectable, selected }: NodeProps<NodeData>) => {
+export const TextUpdaterNode = memo(({ data, isConnectable, selected }: NodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   
@@ -22,7 +22,7 @@ export const TextUpdaterNode = memo(({ data, isConnectable, selected }: NodeProp
   
   // Handle text change
   const onChange = useCallback((evt: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (data?.onLabelChange) {
+    if (data && typeof data.onLabelChange === 'function') {
       data.onLabelChange(evt.target.value);
     }
   }, [data]);
@@ -69,7 +69,7 @@ export const TextUpdaterNode = memo(({ data, isConnectable, selected }: NodeProp
           <textarea
             ref={textAreaRef}
             name="text"
-            value={data?.label || ''}
+            value={data ? data.label || '' : ''}
             onChange={onChange}
             onBlur={onBlur}
             onKeyDown={onKeyDown}
@@ -82,7 +82,7 @@ export const TextUpdaterNode = memo(({ data, isConnectable, selected }: NodeProp
           className="p-3 break-words whitespace-pre-wrap min-h-[60px]" 
           onDoubleClick={onDoubleClick}
         >
-          {data?.label || 'Double-click to edit'}
+          {data && data.label ? data.label : 'Double-click to edit'}
         </div>
       )}
       

@@ -2,7 +2,7 @@
 import React from 'react';
 import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
 
-// Define properly typed data interfaces for the edge types
+// Define properly typed data interfaces
 export interface ButtonEdgeData {
   onDelete?: (id: string) => void;
   animated?: boolean;
@@ -21,7 +21,7 @@ export const ButtonEdge = React.memo(({
   style = {},
   markerEnd,
   data,
-}: EdgeProps<ButtonEdgeData>) => {
+}: EdgeProps) => {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -33,7 +33,7 @@ export const ButtonEdge = React.memo(({
   
   const onEdgeClick = (evt: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     evt.stopPropagation();
-    if (data?.onDelete) {
+    if (data && typeof data.onDelete === 'function') {
       data.onDelete(id);
     }
   };
@@ -71,7 +71,7 @@ export interface SmoothStepEdgeData {
 }
 
 // Smooth step edge with animation options
-export const SmoothStepEdge = React.memo((props: EdgeProps<SmoothStepEdgeData>) => {
+export const SmoothStepEdge = React.memo((props: EdgeProps) => {
   const { style = {}, data, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, markerEnd } = props;
   
   // Calculate the path
@@ -87,13 +87,13 @@ export const SmoothStepEdge = React.memo((props: EdgeProps<SmoothStepEdgeData>) 
   // Add animation class if specified in data
   const customStyle = {
     ...style,
-    ...(data?.animated ? { animation: 'flowLineAnimation 30s infinite linear' } : {}),
+    ...(data && data.animated ? { animation: 'flowLineAnimation 30s infinite linear' } : {}),
   };
   
   return <BaseEdge path={edgePath} markerEnd={markerEnd} style={customStyle} />;
 });
 
-// Export types with React.memo for better performance
+// Export types
 export const edgeTypes = {
   buttonEdge: ButtonEdge,
   smoothStepEdge: SmoothStepEdge,

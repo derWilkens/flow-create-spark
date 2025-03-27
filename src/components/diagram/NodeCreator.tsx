@@ -7,7 +7,7 @@ import { createNode, NodeData, CustomNode } from '../../utils/diagramUtils';
 export function useNodeCreator(
   reactFlowInstance: any, 
   onNodeLabelChange: (nodeId: string, label: string) => void, 
-  setNodes: React.Dispatch<React.SetStateAction<Node<NodeData>[]>>
+  setNodes: React.Dispatch<React.SetStateAction<CustomNode[]>>
 ) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   

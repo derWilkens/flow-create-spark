@@ -12,8 +12,8 @@ export function useDiagramState() {
   const reactFlowInstance = useReactFlow();
   
   // State for nodes and edges using the right types
-  const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<CustomNode>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<CustomEdge>([]);
   
   // State to track if the diagram is empty
   const [isDiagramEmpty, setIsDiagramEmpty] = useState(true);
