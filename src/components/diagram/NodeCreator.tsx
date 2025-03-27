@@ -2,7 +2,7 @@
 import { useCallback, useRef } from 'react';
 import { Node } from '@xyflow/react';
 import { toast } from 'sonner';
-import { createNode, NodeData } from '../../utils/diagramUtils';
+import { createNode, NodeData, CustomNode } from '../../utils/diagramUtils';
 
 export function useNodeCreator(
   reactFlowInstance: any, 

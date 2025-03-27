@@ -10,7 +10,7 @@ export interface ButtonEdgeData {
 }
 
 // Custom edge with a delete button
-export function ButtonEdge({
+export const ButtonEdge = React.memo(({
   id,
   sourceX,
   sourceY,
@@ -21,7 +21,7 @@ export function ButtonEdge({
   style = {},
   markerEnd,
   data,
-}: EdgeProps<ButtonEdgeData>) {
+}: EdgeProps<ButtonEdgeData>) => {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -63,7 +63,7 @@ export function ButtonEdge({
       </EdgeLabelRenderer>
     </>
   );
-}
+});
 
 export interface SmoothStepEdgeData {
   animated?: boolean;
@@ -71,7 +71,7 @@ export interface SmoothStepEdgeData {
 }
 
 // Smooth step edge with animation options
-export function SmoothStepEdge(props: EdgeProps<SmoothStepEdgeData>) {
+export const SmoothStepEdge = React.memo((props: EdgeProps<SmoothStepEdgeData>) => {
   const { style = {}, data, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, markerEnd } = props;
   
   // Calculate the path
@@ -91,10 +91,10 @@ export function SmoothStepEdge(props: EdgeProps<SmoothStepEdgeData>) {
   };
   
   return <BaseEdge path={edgePath} markerEnd={markerEnd} style={customStyle} />;
-}
+});
 
 // Export types with React.memo for better performance
 export const edgeTypes = {
-  buttonEdge: React.memo(ButtonEdge),
-  smoothStepEdge: React.memo(SmoothStepEdge),
+  buttonEdge: ButtonEdge,
+  smoothStepEdge: SmoothStepEdge,
 };

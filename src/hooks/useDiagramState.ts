@@ -11,7 +11,7 @@ export function useDiagramState() {
   // React Flow hook for accessing instance methods
   const reactFlowInstance = useReactFlow();
   
-  // State for nodes and edges
+  // State for nodes and edges using the right types
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   

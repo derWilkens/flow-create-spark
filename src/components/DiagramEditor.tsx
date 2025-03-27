@@ -7,8 +7,6 @@ import {
   Background,
   BackgroundVariant,
   Panel,
-  NodeTypes,
-  EdgeTypes,
 } from '@xyflow/react';
 import { toast } from 'sonner';
 
@@ -74,13 +72,15 @@ export function DiagramEditor() {
   const memoizedEdgeTypes = useMemo(() => customEdgeTypes, []);
   
   // Prepare edge data with onDelete callback
-  const edgesWithDeleteCallback = edges.map(edge => ({
-    ...edge,
-    data: {
-      ...(edge.data || {}),
-      onDelete: onDeleteEdge,
-    },
-  }));
+  const edgesWithDeleteCallback = useMemo(() => {
+    return edges.map(edge => ({
+      ...edge,
+      data: {
+        ...(edge.data || {}),
+        onDelete: onDeleteEdge,
+      },
+    }));
+  }, [edges, onDeleteEdge]);
   
   return (
     <div className="w-full h-full" ref={reactFlowWrapper}>
